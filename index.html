@@ -139,8 +139,41 @@ summary{cursor:pointer}
   var LINKS = {
     testflight: "https://testflight.apple.com/join/tmhC3n9D",
     firebase: "",     // lien d'invitation Firebase App Distribution
-    feedback: ""      // ex. mailto:ton.email@exemple.com
+    feedback: ""      // construit automatiquement plus bas
   };
+  var FEEDBACK = {
+    to: "contact@winds-up.com",
+    cc: "ben.mcmurrich@gmail.com",
+    subject: "App Winds-Up Beta Feedback"
+  };
+  // ========================================
+  function deviceInfo() {
+    var ua = navigator.userAgent || "", m, device = "Inconnu", os = "Inconnu", browser = "Inconnu";
+    if ((m = ua.match(/Android\s([\d.]+);\s*([^;)]+)/))) { os = "Android " + m[1]; device = m[2].replace(/\sBuild.*$/, "").trim(); }
+    else if (/Android/i.test(ua)) { os = "Android"; }
+    else if ((m = ua.match(/(iPhone|iPad|iPod).*?OS\s([\d_]+)/))) { device = m[1]; os = "iOS " + m[2].replace(/_/g, "."); }
+    else if (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) { device = "iPad"; os = "iPadOS"; }
+    else if ((m = ua.match(/Mac OS X\s([\d_]+)/))) { device = "Mac"; os = "macOS " + m[1].replace(/_/g, "."); }
+    else if (/Windows/i.test(ua)) { device = "PC"; os = "Windows"; }
+    if (/CriOS|Chrome\//.test(ua) && !/Edg/.test(ua)) browser = "Chrome";
+    else if (/FxiOS|Firefox\//.test(ua)) browser = "Firefox";
+    else if (/Edg/.test(ua)) browser = "Edge";
+    else if (/Safari\//.test(ua)) browser = "Safari";
+    var dpr = window.devicePixelRatio || 1;
+    return [
+      "Appareil : " + device,
+      "Système : " + os,
+      "Navigateur : " + browser,
+      "Écran : " + screen.width + "×" + screen.height + " @" + dpr + "x",
+      "Langue : " + (navigator.language || "?"),
+      "Version de l'app : (à compléter, visible dans TestFlight / App Tester)",
+      "User-agent : " + ua
+    ].join("\n");
+  }
+  LINKS.feedback = "mailto:" + FEEDBACK.to
+    + "?cc=" + encodeURIComponent(FEEDBACK.cc)
+    + "&subject=" + encodeURIComponent(FEEDBACK.subject)
+    + "&body=" + encodeURIComponent("Bonjour,\n\n[Décrivez votre retour ici : bug, idée, spot concerné…]\n\n\n\n---\nInfos techniques (merci de les laisser, elles aident à reproduire le problème) :\n" + deviceInfo());
   // ========================================
   document.querySelectorAll("[data-link]").forEach(function (a) {
     var url = LINKS[a.getAttribute("data-link")];
